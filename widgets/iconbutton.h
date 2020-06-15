@@ -32,7 +32,7 @@ class IconButton : public TextButton
     Q_OBJECT
 
 public:
-    IconButton(int normalSize=23, int hoverSize=26, QWidget *parent = nullptr);
+    IconButton(int normalSize = 23, int hoverSize = 26, QWidget *parent = nullptr);
     ~IconButton();
 
     void setIcon(const QString &fileName);

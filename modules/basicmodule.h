@@ -29,6 +29,8 @@
 #include "../widgets/basickeypad.h"
 #include "expressionbar.h"
 
+DWIDGET_USE_NAMESPACE
+
 class BasicModule : public QWidget
 {
     Q_OBJECT
@@ -39,11 +41,14 @@ public:
 
     void switchToSimpleKeypad();
     void switchToScientificKeypad();
+    void setKeyPress(QKeyEvent *e);
 
-private:
+private slots:
     void initTheme();
+private:
     void handleEditKeyPress(QKeyEvent *);
     void handleKeypadButtonPress(int);
+    void equalButtonPress();
     void handleClearStateChanged(bool isAllClear);
 
 protected:

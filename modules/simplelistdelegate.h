@@ -21,18 +21,44 @@
 #define SIMPLELISTDELEGATE_H
 
 #include <QAbstractItemDelegate>
-
+#include <QObject>
 class SimpleListDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool m_selected WRITE setSelect)
 public:
     SimpleListDelegate(QObject *parent = nullptr);
     ~SimpleListDelegate();
+    void setHisLink(const int link);
+    void setHisLinked(const int linked);
+    void removeLine(const int link, const int linked);
+    void removeLine(int index);
+    void removeHisLink();
+    void removeAllLink();
+    void removeHisLinked();  // add 20200318 for fix cleanlinkcache
+public slots:
+    void setThemeType(QString type);
 
 protected:
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option,
+               const QModelIndex &index) const;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
+                     const QModelIndex &index);
+signals:
+    void obtainingHistorical(const QModelIndex &index);
+    void historicalLinkage(const QModelIndex &index);
+
+private:
+    void setSelect(bool isSelect) { m_selected = isSelect; };
+    void cutApart(const QString text, QString &linkNum, QString &expStr);
+
+    SimpleListDelegate *m_simpleListDelegate;
+    QVector<int> m_linkItem;
+    QVector<int> m_linkedIten;
+    bool m_selected;
+    QString m_type;
 };
 
 #endif
