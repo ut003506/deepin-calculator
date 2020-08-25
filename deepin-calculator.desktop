@@ -1,7 +1,8 @@
 [Desktop Entry]
 Categories=Utility;Calculator;
 Comment=Calculator
-Exec=deepin-calculator
+#Exec=deepin-calculator
+Exec=/usr/bin/deepin-turbo-invoker  --type=dtkwidget deepin-calculator %U 
 GenericName=Calculator
 Icon=deepin-calculator
 Name=Deepin Calculator
@@ -10,6 +11,7 @@ TryExec=deepin-calculator
 Type=Application
 X-Deepin-ManualID=deepin-calculator
 X-Deepin-Vendor=deepin
+TZ='Asia/Shanghai'
 
 # Translations:
 # Do not manually modify!
