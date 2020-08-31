@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wl,-as-need -fPIE")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wl,--as-needed -fPIE")
 set(QT_MINIMUM_VERSION "5.7.1")
 set(CMAKE_EXE_LINKER_FLAGS "-pie")
 
@@ -24,7 +24,7 @@ endif ()
 
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "mips64")
     message(STATUS "this system is mips64=========")
-    set(FLAGS_COMMON "-O3 -ftree-vectorize -march=loongson3a -mhard-float -mno-micromips -mno-mips16 -flax-vector-conversions -mloongson-ext2 -mloongson-mmi -Wl, as-need")
+    set(FLAGS_COMMON "-O3 -ftree-vectorize -march=loongson3a -mhard-float -mno-micromips -mno-mips16 -flax-vector-conversions -mloongson-ext2 -mloongson-mmi -Wl,--as-needed")
 endif()
 
 if (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug"))
