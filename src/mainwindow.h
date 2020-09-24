@@ -24,9 +24,9 @@
 #include <QMenu>
 #include <DMainWindow>
 
-#include "modules/basicmodule.h"
-#include "modules/scientificmodule.h"
-#include "widgets/iconbutton.h"
+#include "widgets/basicmodule.h"
+#include "widgets/scientificmodule.h"
+#include "control/iconbutton.h"
 #include "dsettings.h"
 
 #define ENABLE_SCIENTIFIC 1
@@ -59,7 +59,7 @@ private:
     void hideHistoryWidget(bool hissetting);
 
 private:
-    DSettings *m_settings;
+    DSettingsAlt *m_settings;
     QStackedLayout *m_mainLayout;
     DMenu *m_tbMenu;
     DMenu *m_modeshowmenu;

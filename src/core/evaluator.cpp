@@ -22,11 +22,11 @@
 // the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 // Boston, MA 02110-1301, USA.
 
-#include "src/core/evaluator.h"
-#include "src/core/session.h"
-#include "src/core/settings.h"
-#include "../math/rational.h"
-#include "../math/units.h"
+#include "core/evaluator.h"
+#include "core/session.h"
+#include "core/settings.h"
+#include "math/rational.h"
+#include "math/units.h"
 
 #include <QCoreApplication>
 #include <QRegularExpression>
@@ -316,11 +316,12 @@ static int opPrecedence(Token::Operator op)
         // Not really operator but needed for managing shift/reduce conflicts.
         prec = 600;
         break;
+    //edit jingzhou 20200831 取余的优先级与乘除相同
+    case Token::Modulo:
     case Token::Multiplication:
     case Token::Division:
         prec = 500;
         break;
-    case Token::Modulo:
     case Token::IntegerDivision:
     //add jingzhou 20200720
     case Token::Yroot:

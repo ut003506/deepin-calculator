@@ -27,8 +27,8 @@
 #include <QStringList>
 #include <DMenu>
 
-#include "src/math/floatconfig.h"
-#include "src/utils.h"
+#include "math/floatconfig.h"
+#include "utils.h"
 
 InputEdit::InputEdit(QWidget *parent)
     : QLineEdit(parent)
@@ -57,7 +57,6 @@ InputEdit::InputEdit(QWidget *parent)
     connect(this, &QLineEdit::textChanged, this, &InputEdit::handleTextChanged);
     connect(this, &QLineEdit::cursorPositionChanged, this, &InputEdit::handleCursorPositionChanged);
     connect(this, &QLineEdit::customContextMenuRequested, this, &InputEdit::showTextEditMenu); //右键菜单信号槽
-    connect(this, &InputEdit::returnPressed, this, &InputEdit::pressSlot);
     connect(this, &QLineEdit::selectionChanged, this, &InputEdit::selectionChangedSlot);
     connect(this, &QLineEdit::selectionChanged, [ = ] {
         int pos = this->cursorPosition();
@@ -65,13 +64,6 @@ InputEdit::InputEdit(QWidget *parent)
     });
 
     connect(this, &QLineEdit::textChanged, this, &InputEdit::isExpressionEmpty);
-
-//    DPalette pl = this->palette();
-    // pl.setColor(DPalette::Text,QColor(48,48,48));
-//    pl.setColor(DPalette::Button, Qt::transparent); //inputedit背景色
-//    pl.setColor(DPalette::Highlight, Qt::transparent); //边框高亮色
-//    pl.setColor(DPalette::HighlightedText, Qt::blue); //全选字体高亮色
-//    this->setPalette(pl);
 
     m_funclist = {"arcsin", "arccos", "arctan", "arccot", "sin", "cos", "tan", "cot"
                   , "abs", "lg", "ln", "log", "mod", "sqrt", "cbrt", "yroot", "pi", "π"
@@ -85,38 +77,38 @@ InputEdit::~InputEdit() {}
  * @return precentans
  * 由于百分号逻辑改变，此函数暂未使用
  */
-QString InputEdit::expressionPercent(QString &str)
-{
-    QString t = str;
-    bool longnumber = false;
+//QString InputEdit::expressionPercent(QString &str)
+//{
+//    QString t = str;
+//    bool longnumber = false;
 
-    QString ans = DMath::format(m_ans, Quantity::Format::Fixed() + Quantity::Format::Precision(DECPRECISION));
-    m_evaluator->setVariable(QLatin1String("precentans"), m_ans, Variable::BuiltIn); //把ans当作precentans保存
-    /*
-     * 判断ans是否是长数字
-     */
-    if (ans.length() > 17) {
-        for (int i = 17; i < ans.length(); i++) {
-            if (ans.at(i) != "0") {
-                longnumber = true;
-                break;
-            }
-        }
-    }
-    /*
-     * 是长数字时返回ans
-     */
-    if (longnumber && m_lastPos == m_ansStartPos + m_ansLength + 1) {
-        t = QLatin1String("precentans") + str.back();
-        m_ispercentanswer = true;
-    }
-    //    if (m_ansVaild) {
-    //        QString ans = DMath::format(m_ans, Quantity::Format::Precision(DECPRECISION));
-    //        t.remove(m_ansStartPos, m_ansLength);
-    //        t.insert(m_ansStartPos, ans);
-    //    }
-    return t;
-}
+//    QString ans = DMath::format(m_ans, Quantity::Format::Fixed() + Quantity::Format::Precision(DECPRECISION));
+//    m_evaluator->setVariable(QLatin1String("precentans"), m_ans, Variable::BuiltIn); //把ans当作precentans保存
+//    /*
+//     * 判断ans是否是长数字
+//     */
+//    if (ans.length() > 17) {
+//        for (int i = 17; i < ans.length(); i++) {
+//            if (ans.at(i) != "0") {
+//                longnumber = true;
+//                break;
+//            }
+//        }
+//    }
+//    /*
+//     * 是长数字时返回ans
+//     */
+//    if (longnumber && m_lastPos == m_ansStartPos + m_ansLength + 1) {
+//        t = QLatin1String("precentans") + str.back();
+//        m_ispercentanswer = true;
+//    }
+//    //    if (m_ansVaild) {
+//    //        QString ans = DMath::format(m_ans, Quantity::Format::Precision(DECPRECISION));
+//    //        t.remove(m_ansStartPos, m_ansLength);
+//    //        t.insert(m_ansStartPos, ans);
+//    //    }
+//    return t;
+//}
 
 /**
  * @brief 在点击等于号时使用此函数判断输入框中是否存在上一次结果的长数字
@@ -187,24 +179,24 @@ void InputEdit::setAnswer(const QString &str, const Quantity &ans)
  * @param Pos-光标位置
  * （由于百分号逻辑改变，暂未使用）
  */
-void InputEdit::setPercentAnswer(const QString &str1, const QString &str2, const Quantity &ans,
-                                 const int &Pos)
-{
-    if (m_ispercentanswer) {
-        m_ans = ans;
-        m_ansStartPos = Pos + ((Pos == 0) ? 0 : 1); //edit 20200416
-        m_ansLength = str2.length();
-        m_oldText = "";
-        setText(str1);
-        int ansEnd = m_ansStartPos + m_ansLength;
-        while (ansEnd > str1.length()) {
-            --ansEnd;
-        }
-        m_ansVaild = /*m_ansLength > 10 &&*/ m_ansLength > 0 && (m_ansStartPos == 0 || !str1[m_ansStartPos - 1].isDigit()) &&
-                                             (ansEnd == str1.length() || !str1[ansEnd].isDigit());
-    }
-    m_ispercentanswer = false;
-}
+//void InputEdit::setPercentAnswer(const QString &str1, const QString &str2, const Quantity &ans,
+//                                 const int &Pos)
+//{
+//    if (m_ispercentanswer) {
+//        m_ans = ans;
+//        m_ansStartPos = Pos + ((Pos == 0) ? 0 : 1); //edit 20200416
+//        m_ansLength = str2.length();
+//        m_oldText = "";
+//        setText(str1);
+//        int ansEnd = m_ansStartPos + m_ansLength;
+//        while (ansEnd > str1.length()) {
+//            --ansEnd;
+//        }
+//        m_ansVaild = /*m_ansLength > 10 &&*/ m_ansLength > 0 && (m_ansStartPos == 0 || !str1[m_ansStartPos - 1].isDigit()) &&
+//                                             (ansEnd == str1.length() || !str1[ansEnd].isDigit());
+//    }
+//    m_ispercentanswer = false;
+//}
 
 /**
  * @brief 清空输入框且更新ans参数
@@ -248,7 +240,8 @@ void InputEdit::keyPressEvent(QKeyEvent *e)
  */
 void InputEdit::mouseDoubleClickEvent(QMouseEvent *e)
 {
-    Q_UNUSED(e);
+    //fix bug-47162保持触摸屏双击输入框与其他应用一致
+    QLineEdit::mouseDoubleClickEvent(e);
     selectAll();
     m_selected.selected = text();
     /*if (e->button() == Qt::LeftButton) {
@@ -270,16 +263,26 @@ void InputEdit::mousePressEvent(QMouseEvent *e)
     QLineEdit::mousePressEvent(e);
 }
 
+void InputEdit::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::MiddleButton) {
+        emit paste();
+        return;
+    }
+    QLineEdit::mouseReleaseEvent(event);
+}
+
 /**
  * @brief 右键菜单action初始化
  */
 void InputEdit::initAction()
 {
-    m_undo = new QAction(tr("&Undo"), this);
-    m_redo = new QAction(tr("&Redo"), this);
-    m_cut = new QAction(tr("Cu&t"), this);
-    m_copy = new QAction(tr("&Copy"), this);
-    m_paste = new QAction(tr("&Paste"), this);
+    //fix bug-47321
+    m_undo = new QAction(tr("Undo"), this);
+    m_redo = new QAction(tr("Redo"), this);
+    m_cut = new QAction(tr("Cut"), this);
+    m_copy = new QAction(tr("Copy"), this);
+    m_paste = new QAction(tr("Paste"), this);
     m_delete = new QAction(tr("Delete"), this);
     m_select = new QAction(tr("Select All"), this);
 
@@ -300,81 +303,63 @@ void InputEdit::initAction()
 }
 
 /**
- * @brief 更新右键菜单状态
+ * 暂未使用
  */
-void InputEdit::updateAction()
-{
-    if (this->text().isEmpty()) {
-        m_select->setEnabled(false);
-        m_delete->setEnabled(false);
-        m_copy->setEnabled(false);
-        m_cut->setEnabled(false);
-    } else {
-        m_select->setEnabled(true);
-        m_delete->setEnabled(true);
-        m_copy->setEnabled(false);
-        m_cut->setEnabled(true);
-    }
-}
+//bool InputEdit::isSymbolCategoryChanged(int pos1, int pos2)
+//{
+//    QString str = text();
+//    QChar::Category category1 = str.at(pos1).category();
+//    QChar::Category category2 = str.at(pos2).category();
+
+//    if (category1 == QChar::Number_DecimalDigit || category1 == QChar::Punctuation_Other) {
+//        if (category2 == QChar::Number_DecimalDigit || category2 == QChar::Punctuation_Other) {
+//            return false;
+//        }
+//    }
+
+//    return true;
+//}
 
 /**
  * 暂未使用
  */
-bool InputEdit::isSymbolCategoryChanged(int pos1, int pos2)
-{
-    QString str = text();
-    QChar::Category category1 = str.at(pos1).category();
-    QChar::Category category2 = str.at(pos2).category();
+//int InputEdit::findWordBeginPosition(int pos)
+//{
+//    QString str = text();
 
-    if (category1 == QChar::Number_DecimalDigit || category1 == QChar::Punctuation_Other) {
-        if (category2 == QChar::Number_DecimalDigit || category2 == QChar::Punctuation_Other) {
-            return false;
-        }
-    }
+//    if (0 >= pos) {
+//        return 0;
+//    }
+//    while (pos > 0) {
+//        pos--;
+//        if (isSymbolCategoryChanged(pos, pos + 1)) {
+//            return pos + 1;
+//        }
+//    }
 
-    return true;
-}
-
-/**
- * 暂未使用
- */
-int InputEdit::findWordBeginPosition(int pos)
-{
-    QString str = text();
-
-    if (0 >= pos) {
-        return 0;
-    }
-    while (pos > 0) {
-        pos--;
-        if (isSymbolCategoryChanged(pos, pos + 1)) {
-            return pos + 1;
-        }
-    }
-
-    return 0;
-}
+//    return 0;
+//}
 
 /**
  * 暂未使用
  */
-int InputEdit::findWordEndPosition(int pos)
-{
-    QString str = text();
+//int InputEdit::findWordEndPosition(int pos)
+//{
+//    QString str = text();
 
-    if (pos >= str.length()) {
-        return str.length() - 1;
-    }
+//    if (pos >= str.length()) {
+//        return str.length() - 1;
+//    }
 
-    while (pos < str.length() - 1) {
-        pos++;
-        if (isSymbolCategoryChanged(pos, pos - 1)) {
-            return pos - 1;
-        }
-    }
+//    while (pos < str.length() - 1) {
+//        pos++;
+//        if (isSymbolCategoryChanged(pos, pos - 1)) {
+//            return pos - 1;
+//        }
+//    }
 
-    return str.length() - 1;
-}
+//    return str.length() - 1;
+//}
 
 /**
  * @brief InputEdit::输入框字号变化
@@ -441,7 +426,6 @@ void InputEdit::handleTextChanged(const QString &text)
         return;
     }
 
-
     int ansEnd = m_ansStartPos + m_ansLength;
 
     m_oldText = text;
@@ -474,7 +458,6 @@ void InputEdit::handleTextChanged(const QString &text)
     //    reformatStr = symbolFaultTolerance(reformatStr);
     setText(reformatStr);
     autoZoomFontSize();
-    updateAction(); //textchanged时更新右键菜单状态
 
     // reformat text.
     int oldLength = text.length();
@@ -690,23 +673,6 @@ void InputEdit::BracketCompletion(QKeyEvent *e)
 }
 
 /**
- * @brief 未安装事件过滤器
- */
-bool InputEdit::eventFilter(QObject *watched, QEvent *event)
-{
-    if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        Q_EMIT keyPress(keyEvent);
-        return true;
-    } else if (event->type() == QEvent::MouseButtonDblClick) {
-        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-        mouseDoubleClickEvent(mouseEvent);
-        return true;
-    }
-    return QLineEdit::eventFilter(watched, event);
-}
-
-/**
  * @brief 猜测防止异常情况\n出现在)及%后补*,当前text中不会出现\n,故此函数无效
  */
 void InputEdit::multipleArithmetic(QString &text)
@@ -724,6 +690,9 @@ void InputEdit::multipleArithmetic(QString &text)
     }
 }
 
+/**
+ * @brief 在鼠标处显示菜单
+ */
 void InputEdit::showTextEditMenu()
 {
     DMenu *menu = new DMenu(this);
@@ -741,21 +710,31 @@ void InputEdit::showTextEditMenu()
     else
         m_paste->setEnabled(true);
 
-    if (this->selectedText().isEmpty())
+    if (this->selectedText().isEmpty()) {
         m_cut->setEnabled(false);
-    else
+        m_copy->setEnabled(false);
+        m_delete->setEnabled(false);
+    } else {
         m_cut->setEnabled(true);
+        m_copy->setEnabled(true);
+        m_delete->setEnabled(true);
+    }
+
+    //全选需要有内容
+    if (this->text() != QString()) {
+        m_select->setEnabled(true);
+    } else {
+        m_select->setEnabled(false);
+    }
 
     menu->move(cursor().pos());
     menu->exec();
     menu->deleteLater();
 }
 
-void InputEdit::pressSlot()
-{
-    return;
-}
-
+/**
+ * @brief 在光标处显示菜单
+ */
 void InputEdit::showTextEditMenuByAltM()
 {
     DMenu *menu = new DMenu(this);
@@ -773,10 +752,22 @@ void InputEdit::showTextEditMenuByAltM()
     else
         m_paste->setEnabled(true);
 
-    if (this->selectedText().isEmpty())
+    if (this->selectedText().isEmpty()) {
         m_cut->setEnabled(false);
-    else
+        m_copy->setEnabled(false);
+        m_delete->setEnabled(false);
+    } else {
         m_cut->setEnabled(true);
+        m_copy->setEnabled(true);
+        m_delete->setEnabled(true);
+    }
+
+    //全选需要有内容
+    if (this->text() != QString()) {
+        m_select->setEnabled(true);
+    } else {
+        m_select->setEnabled(false);
+    }
 
     menu->move(mapToGlobal(cursorRect().bottomRight()));
     menu->exec();
@@ -788,11 +779,6 @@ void InputEdit::showTextEditMenuByAltM()
  */
 void InputEdit::selectionChangedSlot()
 {
-    if (this->selectedText().isEmpty()) { //无选中项时关闭右键复制
-        m_copy->setEnabled(false);
-    } else {
-        m_copy->setEnabled(true);
-    }
     if (!hasFocus())
         return; //只有选中被改变情况下给m_selected赋值,选中输入不会改变;选中输入后优先级高于cursorchanged，去掉return无意义
     m_selected.oldText = text();
