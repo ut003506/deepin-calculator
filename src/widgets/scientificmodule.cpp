@@ -29,21 +29,21 @@
 #include <QHBoxLayout>
 
 #include "dthememanager.h"
-#include "utils.h"
-#include "math/quantity.h"
+#include "src/utils.h"
+#include "src/math/quantity.h"
 
 const int EXPRESSIONBAR_HEIGHT = 95;
 
 scientificModule::scientificModule(QWidget *parent)
     : DWidget(parent)
 {
-    m_scikeypadwidget = new ScientificKeyPad(this);
+    m_scikeypadwidget = new ScientificKeyPad;
     m_scihiswidget = new SciHistoryWidget(this);
     m_memCalbtn = false;
     m_memRCbtn = false;
     QHBoxLayout *layout = new QHBoxLayout(this);
     QVBoxLayout *leftlay = new QVBoxLayout();
-    m_sciexpressionBar = new SciExpressionBar(this);
+    m_sciexpressionBar = new SciExpressionBar;
     m_memoryPublic = MemoryPublic::instance(this);
     m_sciexpressionBar->setFixedHeight(EXPRESSIONBAR_HEIGHT);
     leftlay->addWidget(m_sciexpressionBar);
@@ -104,7 +104,6 @@ scientificModule::scientificModule(QWidget *parent)
         QString str = p.first;
         m_sciexpressionBar->getInputEdit()->setAnswer(str.remove("\n"), p.second);
         m_sciexpressionBar->getInputEdit()->setFocus();
-        this->handleClearStateChanged(false);
         MemoryButton *btn = static_cast<MemoryButton *>(m_scikeypadwidget->button(ScientificKeyPad::Key_MC));
         btn->setEnabled(true);
         MemoryButton *btn1 = static_cast<MemoryButton *>(m_scikeypadwidget->button(ScientificKeyPad::Key_MR));
@@ -336,6 +335,7 @@ void scientificModule::handleEditKeyPress(QKeyEvent *e)
     case Qt::Key_V:
         if (isPressCtrl) {
             m_sciexpressionBar->copyClipboard2Result();
+            m_sciexpressionBar->addUndo();
         } else {
             m_sciexpressionBar->enterFEEvent(m_FEisdown);
             m_scikeypadwidget->animate(ScientificKeyPad::Key_FE);
@@ -357,6 +357,7 @@ void scientificModule::handleEditKeyPress(QKeyEvent *e)
             m_sciexpressionBar->enterSymbolEvent("*");
             m_sciexpressionBar->addUndo();
         }
+        m_sciexpressionBar->addUndo();
         break;
     case Qt::Key_Delete:
         m_sciexpressionBar->enterClearEvent();
@@ -411,7 +412,6 @@ void scientificModule::handleEditKeyPress(QKeyEvent *e)
             m_scikeypadwidget->animate(ScientificKeyPad::Key_MR);
             m_sciexpressionBar->getInputEdit()->setAnswer(m_scihiswidget->findChild<MemoryWidget *>()->getfirstnumber().first
                                                           , m_scihiswidget->findChild<MemoryWidget *>()->getfirstnumber().second);
-            this->handleClearStateChanged(false);
         } else if (!isPressCtrl) {
             if (isPressShift) {
                 m_scikeypadwidget->animate(ScientificKeyPad::Key_Rand);
@@ -750,7 +750,6 @@ void scientificModule::handleKeypadButtonPress(int key)
     case ScientificKeyPad::Key_MR:
         m_sciexpressionBar->getInputEdit()->setAnswer(m_scihiswidget->findChild<MemoryWidget *>()->getfirstnumber().first
                                                       , m_scihiswidget->findChild<MemoryWidget *>()->getfirstnumber().second);
-        this->handleClearStateChanged(false);
         break;
     case ScientificKeyPad::Key_deg:
         m_sciexpressionBar->enterDegEvent(m_deg);
@@ -1057,7 +1056,6 @@ void scientificModule::handleKeypadButtonPressByspace(int key)
     case ScientificKeyPad::Key_MR:
         m_sciexpressionBar->getInputEdit()->setAnswer(m_scihiswidget->findChild<MemoryWidget *>()->getfirstnumber().first
                                                       , m_scihiswidget->findChild<MemoryWidget *>()->getfirstnumber().second);
-        this->handleClearStateChanged(false);
         break;
     case ScientificKeyPad::Key_deg:
         m_sciexpressionBar->enterDegEvent(m_deg);
@@ -1387,7 +1385,6 @@ void scientificModule::mUnAvailableEvent()
 {
     MemoryButton *btn = static_cast<MemoryButton *>(m_scikeypadwidget->button(ScientificKeyPad::Key_MC));
     btn->setEnabled(false);
-    btn->updateWhenBtnDisable();
     MemoryButton *btn1 = static_cast<MemoryButton *>(m_scikeypadwidget->button(ScientificKeyPad::Key_MR));
     btn1->setEnabled(false);
     m_memRCbtn = false;

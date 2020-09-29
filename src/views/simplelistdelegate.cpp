@@ -28,7 +28,7 @@
 #include "dthememanager.h"
 #include "simplelistmodel.h"
 #include "simplelistview.h"
-#include "utils.h"
+#include "src/utils.h"
 
 DWIDGET_USE_NAMESPACE
 
@@ -40,6 +40,7 @@ SimpleListDelegate::SimpleListDelegate(int mode, QObject *parent)
     : QStyledItemDelegate(parent)
 {
     m_mode = mode;
+    m_settings = DSettings::instance(this);
     m_selected = false;
     m_simpleListDelegate = this;
 }
@@ -146,8 +147,8 @@ void SimpleListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
                                const QModelIndex &index) const
 {
     drawFocusStatus(painter, option); //焦点边框
+    const QString expression = index.data(SimpleListModel::ExpressionRole).toString();
     if (m_mode == 0) {
-        const QString expression = index.data(SimpleListModel::ExpressionRole).toString();
         QRect rect(option.rect);
         rect.setRight(option.widget->width() - 13);
         QString errorFontColor;
@@ -266,7 +267,6 @@ void SimpleListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
                               Qt::AlignVCenter | Qt::AlignRight, linkNum);
         }
     } else if (m_mode == 1) {
-        const QString expression = index.data(SimpleListModel::ExpressionWithOutTip).toString();
         QRect rect(option.rect);
         rect.setRight(option.widget->width() - 5); //设置矩形右边缘,会导致rect宽度改变
         QString errorFontColor;
@@ -387,7 +387,7 @@ QSize SimpleListDelegate::sizeHint(const QStyleOptionViewItem &option,
 {
     Q_UNUSED(option);
     if (m_mode == 1) {
-        const QString expression = index.data(SimpleListModel::ExpressionWithOutTip).toString();
+        const QString expression = index.data(SimpleListModel::ExpressionRole).toString();
         const int rectwidth = 356; //paintevent设置右边缘后的宽度
         QStringList splitList = expression.split("＝");
         if (splitList.size() == 1)

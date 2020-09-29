@@ -30,8 +30,6 @@
 #include <QClipboard>
 #include <DGuiApplicationHelper>
 
-const QSize MEMORYBUTTON_SIZE = QSize(52, 32); //内存按键大小，为画边框比ui大2pix
-
 MemoryItemWidget::MemoryItemWidget(QWidget *parent)
     : QWidget(parent)
     , m_btnplus(new MemoryButton(QString("M+"), true, this))
@@ -39,15 +37,11 @@ MemoryItemWidget::MemoryItemWidget(QWidget *parent)
     , m_btnclean(new MemoryButton(QString("MC"), true, this))
     , m_label(new QLabel(this))
 {
-    setFocusPolicy(Qt::NoFocus);
     QVBoxLayout *layV = new QVBoxLayout(this); //存放四个控件
     QHBoxLayout *lay = new QHBoxLayout(); //存放三个按钮
 
     lay->addStretch();
     lay->setSpacing(3); //按钮比ui大2pix
-    m_btnplus->setFixedSize(MEMORYBUTTON_SIZE);
-    m_btnminus->setFixedSize(MEMORYBUTTON_SIZE);
-    m_btnclean->setFixedSize(MEMORYBUTTON_SIZE);
     lay->addWidget(m_btnclean);
     lay->addWidget(m_btnplus);
     lay->addWidget(m_btnminus);
@@ -107,7 +101,7 @@ void MemoryItemWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::RightButton)
         return;
-//    setFocus();
+    setFocus();
     m_ispress = true;
     DPalette pl1 = this->palette(); //按下时给label字体设置颜色
     if (m_themetype == 1) {
@@ -127,7 +121,7 @@ void MemoryItemWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::RightButton)
         return;
-//    clearFocus();
+    clearFocus();
     m_ispress = false;
     DPalette pl1 = this->palette(); //松开鼠标时给label字体重新设置颜色
     if (m_themetype == 1) {

@@ -26,8 +26,8 @@
 #include <QVBoxLayout>
 
 #include "dthememanager.h"
-#include "utils.h"
-#include "math/quantity.h"
+#include "src/utils.h"
+#include "src/math/quantity.h"
 
 const int new_Func_Percent = 0; //0-旧的百分号方法 1-新
 
@@ -35,8 +35,8 @@ BasicModule::BasicModule(QWidget *parent)
     : DWidget(parent)
 {
     m_keypadLayout = new QStackedLayout;
-    m_basicKeypad = new BasicKeypad(this);
-    m_memoryKeypad = new MemoryKeypad(this);
+    m_basicKeypad = new BasicKeypad;
+    m_memoryKeypad = new MemoryKeypad;
     m_insidewidget = false;
     m_memCalbtn = false;
     m_memRCbtn = false;
@@ -44,7 +44,7 @@ BasicModule::BasicModule(QWidget *parent)
     m_memoryPublic = MemoryPublic::instance(this);
     m_memorylistwidget = m_memoryPublic->getwidget(MemoryPublic::standardleft);
     QVBoxLayout *layout = new QVBoxLayout(this);
-    m_expressionBar = new ExpressionBar(this);
+    m_expressionBar = new ExpressionBar;
     layout->addWidget(m_expressionBar);
     layout->addWidget(m_memoryKeypad);
     layout->addSpacing(1); //按钮边框多1pix
@@ -104,7 +104,6 @@ BasicModule::BasicModule(QWidget *parent)
         QString str = p.first;
         m_expressionBar->getInputEdit()->setAnswer(str.remove("\n"), p.second);
         m_expressionBar->getInputEdit()->setFocus();
-        this->handleClearStateChanged(false);
         if (m_keypadLayout->currentIndex() == 1) {
             m_keypadLayout->setCurrentIndex(0);
             m_memoryKeypad->setAttribute(Qt::WA_TransparentForMouseEvents, false);
@@ -153,13 +152,11 @@ BasicModule::BasicModule(QWidget *parent)
             m_memorylistwidget->expressionempty(b);
         }
     });
-    connect(m_memorylistwidget, &MemoryWidget::basicPressEscape, this, &BasicModule::closeListWidget);
     //获取科学模式内存是否为空，处理分开初始化科学模式下增加内存切到标准模式Mlist不能点击情况
     if (!m_memoryPublic->isWidgetEmpty(0))
         mAvailableEvent();
     else
         mUnAvailableEvent();
-    setBasicTabOrder();
 }
 
 BasicModule::~BasicModule() {}
@@ -301,6 +298,7 @@ void BasicModule::handleEditKeyPress(QKeyEvent *e)
     case Qt::Key_V:
         if (isPressCtrl) {
             m_expressionBar->copyClipboard2Result();
+            m_expressionBar->addUndo();
         }
         break;
     case Qt::Key_A:
@@ -316,6 +314,7 @@ void BasicModule::handleEditKeyPress(QKeyEvent *e)
             m_basicKeypad->animate(BasicKeypad::Key_Mult);
             m_expressionBar->addUndo();
         }
+        m_expressionBar->addUndo();
         break;
     case Qt::Key_Delete:
         m_expressionBar->enterClearEvent();
@@ -347,7 +346,6 @@ void BasicModule::handleEditKeyPress(QKeyEvent *e)
         if (isPressCtrl && m_memRCbtn && !m_isallgray) {
             m_memoryKeypad->animate(MemoryKeypad::Key_MR);
             m_expressionBar->getInputEdit()->setAnswer(m_memorylistwidget->getfirstnumber().first, m_memorylistwidget->getfirstnumber().second);
-            this->handleClearStateChanged(false);
         }
         break;
     case Qt::Key_P:
@@ -386,7 +384,6 @@ void BasicModule::handleEditKeyPress(QKeyEvent *e)
  */
 void BasicModule::handleKeypadButtonPress(int key)
 {
-    bool memoryfocus = false;
     m_basicKeypad->update();
     //20200414 bug20294鼠标点击取消focus
     QPair<QString, Quantity> p;
@@ -476,8 +473,7 @@ void BasicModule::handleKeypadButtonPress(int key)
             m_expressionBar->setAttribute(Qt::WA_TransparentForMouseEvents, false);
             m_memoryKeypad->setAttribute(Qt::WA_TransparentForMouseEvents, false);
         }
-        m_memorylistwidget->setFocus(Qt::MouseFocusReason);
-        memoryfocus = true;
+        m_memorylistwidget->setFocus();
         break;
     case MemoryKeypad::Key_Mplus:
         m_expressionBar->settingLinkage();
@@ -492,14 +488,12 @@ void BasicModule::handleKeypadButtonPress(int key)
     case MemoryKeypad::Key_MR:
         p = m_memorylistwidget->getfirstnumber();
         m_expressionBar->getInputEdit()->setAnswer(p.first, p.second);
-        this->handleClearStateChanged(false);
         break;
     default:
         break;
     }
     m_expressionBar->addUndo();
-    if (!memoryfocus)
-        m_expressionBar->getInputEdit()->setFocus();
+    m_expressionBar->getInputEdit()->setFocus();
 }
 
 /**
@@ -622,7 +616,7 @@ void BasicModule::handleKeypadButtonPressByspace(int key)
             m_expressionBar->setAttribute(Qt::WA_TransparentForMouseEvents, false);
             m_memoryKeypad->setAttribute(Qt::WA_TransparentForMouseEvents, false);
         }
-        m_memorylistwidget->setFocus(Qt::TabFocusReason);
+        m_memorylistwidget->setFocus();
         break;
     case MemoryKeypad::Key_Mplus:
         m_memoryKeypad->animate(MemoryKeypad::Key_Mplus, true);
@@ -640,7 +634,6 @@ void BasicModule::handleKeypadButtonPressByspace(int key)
         m_memoryKeypad->animate(MemoryKeypad::Key_MR, true);
         p = m_memorylistwidget->getfirstnumber();
         m_expressionBar->getInputEdit()->setAnswer(p.first, p.second);
-        this->handleClearStateChanged(false);
         break;
     default:
         break;
@@ -659,18 +652,6 @@ void BasicModule::handleClearStateChanged(bool isAllClear)
         btn->setText("AC");
     } else {
         btn->setText("C");
-    }
-}
-
-void BasicModule::setBasicTabOrder()
-{
-    this->setTabOrder(m_expressionBar->getInputEdit(), m_memoryKeypad->button(MemoryKeypad::Key_MC));
-    for (int i = 0; i < 5; i++) {
-        this->setTabOrder(m_memoryKeypad->button(MemoryKeypad::Key_MC + i), m_memoryKeypad->button(MemoryKeypad::Key_MC + i + 1));
-    }
-    this->setTabOrder(m_memoryKeypad->button(MemoryKeypad::Key_Mlist), m_basicKeypad->button(BasicKeypad::Key_Clear));
-    for (int i = 0; i < 20; i++) {
-        this->setTabOrder(m_basicKeypad->button(BasicKeypad::Key_Clear + i), m_basicKeypad->button(BasicKeypad::Key_Clear + i + 1));
     }
 }
 
@@ -705,7 +686,6 @@ void BasicModule::mUnAvailableEvent()
     m_avail = false;
     MemoryButton *btn = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_MC));
     btn->setEnabled(false);
-    btn->updateWhenBtnDisable();
     MemoryButton *btn1 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_MR));
     btn1->setEnabled(false);
     m_memRCbtn = false;
@@ -738,7 +718,6 @@ void BasicModule::showListWidget()
         btn1->setbuttongray(true);
         btn1->setEnabled(false);
         MemoryButton *btn5 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_Mlist));
-        btn5->updateWhenBtnDisable();
         btn5->setbtnlight(true);
         btn5->setEnabled(false);
         m_isallgray = true;
@@ -747,7 +726,7 @@ void BasicModule::showListWidget()
     }*/
 }
 
-void BasicModule::closeListWidget()
+void BasicModule::mousePressEvent(QMouseEvent *event)
 {
     //内存界面显示时，点击内存界面以外部分切换内存界面为键盘界面
     if (m_keypadLayout->currentIndex() == 1 && m_insidewidget == false) {
@@ -785,7 +764,6 @@ void BasicModule::closeListWidget()
     } else {
         MemoryButton *btn = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_MC));
         btn->setEnabled(false);
-        btn->updateWhenBtnDisable();
         MemoryButton *btn1 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_MR));
         btn1->setEnabled(false);
         MemoryButton *btn5 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_Mlist));
@@ -794,60 +772,5 @@ void BasicModule::closeListWidget()
     }
     m_insidewidget = false;
     m_expressionBar->getInputEdit()->isExpressionEmpty(); //确认输入栏是否有内容，发送信号M+,M-,MS是否置灰
-}
-
-void BasicModule::mousePressEvent(QMouseEvent *event)
-{
-//    //内存界面显示时，点击内存界面以外部分切换内存界面为键盘界面
-//    if (m_keypadLayout->currentIndex() == 1 && m_insidewidget == false) {
-//        m_keypadLayout->setCurrentIndex(0);
-//        MemoryButton *btn2 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_Mplus));
-//        btn2->setbuttongray(false);
-//        btn2->setEnabled(true);
-//        MemoryButton *btn3 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_Mminus));
-//        btn3->setbuttongray(false);
-//        btn3->setEnabled(true);
-//        MemoryButton *btn4 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_MS));
-//        btn4->setbuttongray(false);
-//        btn4->setEnabled(true);
-//        MemoryButton *btn = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_MR));
-//        btn->setbuttongray(false);
-//        btn->setEnabled(true);
-//        MemoryButton *btn1 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_MC));
-//        btn1->setbuttongray(false);
-//        btn1->setEnabled(true);
-//        MemoryButton *btn5 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_Mlist));
-//        btn5->setbtnlight(false);
-//        btn5->setEnabled(true);
-//        m_isallgray = false;
-//        m_expressionBar->setAttribute(Qt::WA_TransparentForMouseEvents, false);
-//        m_memoryKeypad->setAttribute(Qt::WA_TransparentForMouseEvents, false);
-//        m_expressionBar->getInputEdit()->setFocus();
-//    }
-
-//    if (m_avail == true) {
-//        MemoryButton *btn = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_MC));
-//        btn->setEnabled(true);
-//        MemoryButton *btn4 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_MR));
-//        btn4->setEnabled(true);
-//        m_memRCbtn = true;
-//    } else {
-//        MemoryButton *btn = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_MC));
-//        btn->setEnabled(false);
-//        btn->updateWhenBtnDisable();
-//        MemoryButton *btn1 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_MR));
-//        btn1->setEnabled(false);
-//        MemoryButton *btn5 = static_cast<MemoryButton *>(m_memoryKeypad->button(MemoryKeypad::Key_Mlist));
-//        btn5->setEnabled(false);
-//        m_memRCbtn = false;
-//    }
-//    m_insidewidget = false;
-//    m_expressionBar->getInputEdit()->isExpressionEmpty(); //确认输入栏是否有内容，发送信号M+,M-,MS是否置灰
-    closeListWidget();
     QWidget::mousePressEvent(event);
-}
-
-void BasicModule::mouseMoveEvent(QMouseEvent *event)
-{
-    Q_UNUSED(event);
 }

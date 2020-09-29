@@ -34,7 +34,7 @@
 #include <QClipboard>
 #include <DGuiApplicationHelper>
 
-#include "utils.h"
+#include "src/utils.h"
 
 const int GLOBALPREC = 78; //全局精度
 const int STANDARD_MWIDGET_HEIGHT = 260; //标准模式memorywidget高度
@@ -53,7 +53,6 @@ MemoryWidget::MemoryWidget(int mode, QWidget *parent)
     , m_isempty(true)
     , m_memoryDelegate(new MemoryItemDelegate(this))
 {
-    this->setAttribute(Qt::WA_DeleteOnClose);
     m_label = new QLabel(this);
     m_calculatormode = mode;
     m_evaluator = Evaluator::instance();
@@ -84,14 +83,8 @@ MemoryWidget::MemoryWidget(int mode, QWidget *parent)
     layH->addSpacing(10);
     if (mode == 1)
         m_clearbutton->hide();
-    connect(m_clearbutton, &TextButton::space, this, [ = ]() {
-        emit memorycleansignal();
-        setFocus();
-    }); //focus下空格按下
-    connect(m_clearbutton, &DPushButton::clicked, this, [ = ]() {
-        emit memorycleansignal();
-        setFocus();
-    });
+    connect(m_clearbutton, &TextButton::space, this, &MemoryWidget::memorycleansignal); //focus下空格按下
+    connect(m_clearbutton, &DPushButton::clicked, this, &MemoryWidget::memorycleansignal);
     lay->addLayout(layH);
     lay->addSpacing(6);
     this->setLayout(lay);
@@ -156,7 +149,6 @@ MemoryWidget::MemoryWidget(int mode, QWidget *parent)
 
     m_listwidget->installEventFilter(this);
     m_clearbutton->installEventFilter(this);
-    this->installEventFilter(this);
     if (m_calculatormode == 0)
         setTabOrder(m_listwidget, m_clearbutton);
 }
@@ -250,6 +242,7 @@ void MemoryWidget::generateData(Quantity answer)
 
 void MemoryWidget::mousePressEvent(QMouseEvent *event)
 {
+    m_type = -1;
     QMouseEvent *pEvent = static_cast<QMouseEvent *>(event);
     m_mousepoint = pEvent->pos();
 
@@ -265,36 +258,17 @@ void MemoryWidget::mousePressEvent(QMouseEvent *event)
 bool MemoryWidget::eventFilter(QObject *obj, QEvent *event)
 {
     if (m_calculatormode == 0) {
-        if (event->type() == QEvent::FocusOut && !(m_listwidget->hasFocus() || m_clearbutton->hasFocus() || this->hasFocus())) {
-            emit basicPressEscape();
-        }
-        if (obj == this && event->type() == QEvent::KeyPress) {
-            QKeyEvent *key_event = static_cast < QKeyEvent *>(event); //将事件转化为键盘事件
-            if (key_event->key() == Qt::Key_Tab) {
-                if (!m_isempty) {
-                    m_listwidget->setCurrentRow(m_currentrow);
-                    m_listwidget->setFocus();
-                } else {
-                    setFocus();
-                }
-                return true;
-            }
-        }
         if (obj == m_listwidget || obj == m_clearbutton) {
             if (event->type() == QEvent::KeyPress) {
                 QKeyEvent *key_event = static_cast < QKeyEvent *>(event); //将事件转化为键盘事件
                 if (key_event->key() == Qt::Key_Tab) {
                     if (m_listwidget->hasFocus()) {
-//                        focusNextChild();//焦点移动
-                        m_clearbutton->setFocus(Qt::TabFocusReason);
+                        focusNextChild();//焦点移动
+                        m_clearbutton->setFocus();
                     } else if (m_clearbutton->hasFocus()) {
-//                        focusNextChild();//焦点移动
-                        m_listwidget->setFocus(Qt::TabFocusReason);
+                        focusNextChild();//焦点移动
+                        m_listwidget->setFocus();
                     }
-                    return true;
-                }
-                if (key_event->key() == Qt::Key_Escape) {
-                    emit basicPressEscape();
                     return true;
                 }
             }
@@ -318,19 +292,11 @@ bool MemoryWidget::eventFilter(QObject *obj, QEvent *event)
  */
 void MemoryWidget::focusInEvent(QFocusEvent *event)
 {
-    if (!m_isempty && event->reason() == Qt::TabFocusReason) {
+    if (!m_isempty)
         m_listwidget->setCurrentRow(m_currentrow);
+    if (m_calculatormode == 1)
         m_listwidget->setFocus();
-    }
     QWidget::focusInEvent(event);
-}
-
-void MemoryWidget::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Escape)
-        emit basicPressEscape();
-    else
-        return;
 }
 
 /**
@@ -406,7 +372,7 @@ void MemoryWidget::memoryclean()
     m_label->show();
     m_listwidget->clear();
     m_list.clear();
-    QListWidgetItem *item1 = new QListWidgetItem(m_listwidget);
+    QListWidgetItem *item1 = new QListWidgetItem();
 
     m_listwidget->insertItem(0, item1);
     if (m_calculatormode == 0)
@@ -596,7 +562,6 @@ QString MemoryWidget::setitemwordwrap(const QString &text, int row)
         }
         if (m_clearbutton->isHidden() == true) {
             m_clearbutton->show();
-            m_clearbutton->updateWhenBtnDisable();
             m_clearbutton->showtooltip(true);
         }
     } else {

@@ -55,7 +55,6 @@ public:
     void mouseMoveEvent(QMouseEvent *e);
 
     DPushButton *button(Buttons key);
-    DPushButton *button(int key);
     void animate(Buttons key, bool isspace = false);
     bool buttonHasFocus();
 

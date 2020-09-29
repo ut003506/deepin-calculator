@@ -23,7 +23,7 @@
 #include <QHash>
 #include <QMap>
 
-#include "quantity.h"
+#include "../math/quantity.h"
 class Rational;
 
 struct Unit {

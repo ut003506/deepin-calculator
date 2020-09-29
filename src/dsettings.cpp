@@ -27,15 +27,15 @@
 #include "utils.h"
 
 DWIDGET_USE_NAMESPACE
-static DSettingsAlt *INSTANCE = nullptr;
+static DSettings *INSTANCE = nullptr;
 
 /**
  * @brief 初始化
  */
-DSettingsAlt *DSettingsAlt::instance(QObject *p)
+DSettings *DSettings::instance(QObject *p)
 {
     if (!INSTANCE) {
-        INSTANCE = new DSettingsAlt(p);
+        INSTANCE = new DSettings(p);
     }
 
     return INSTANCE;
@@ -44,19 +44,19 @@ DSettingsAlt *DSettingsAlt::instance(QObject *p)
 /**
  * @brief 相关信息保存在config.config文件中
  */
-DSettingsAlt::DSettingsAlt(QObject *parent)
+DSettings::DSettings(QObject *parent)
     : QObject(parent),
       m_settings(new QSettings(QDir(Utils::getConfigDir()).filePath("config.config"), QSettings::IniFormat, this))
 {
     initConfig();;
 }
 
-DSettingsAlt::~DSettingsAlt()
+DSettings::~DSettings()
 {
 //    delete m_settings;
 }
 
-void DSettingsAlt::initConfig()
+void DSettings::initConfig()
 {
     if (m_settings->value("theme").toString().isEmpty()) {
         setOption("theme", "light"); //主题初始化为浅色
@@ -86,7 +86,7 @@ void DSettingsAlt::initConfig()
 /**
  * @brief 获取相关参数
  */
-QVariant DSettingsAlt::getOption(const QString &key)
+QVariant DSettings::getOption(const QString &key)
 {
     return m_settings->value(key);
 }
@@ -96,12 +96,12 @@ QVariant DSettingsAlt::getOption(const QString &key)
  * @param key 键
  * @param value 值
  */
-void DSettingsAlt::setOption(const QString &key, const QVariant &value)
+void DSettings::setOption(const QString &key, const QVariant &value)
 {
     m_settings->setValue(key, value);
 }
 
-void DSettingsAlt::deleteInstance()
+void DSettings::deleteInstance()
 {
     delete INSTANCE;
     INSTANCE = nullptr;

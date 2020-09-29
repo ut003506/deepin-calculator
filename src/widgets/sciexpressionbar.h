@@ -31,11 +31,11 @@
 
 #include <DWidget>
 
-#include "core/evaluator.h"
-#include "widgets/inputedit.h"
-#include "views/simplelistdelegate.h"
-#include "views/simplelistmodel.h"
-#include "views/simplelistview.h"
+#include "src/core/evaluator.h"
+#include "src/widgets/inputedit.h"
+#include "src/views/simplelistdelegate.h"
+#include "src/views/simplelistmodel.h"
+#include "src/views/simplelistview.h"
 
 DWIDGET_USE_NAMESPACE
 
@@ -110,7 +110,6 @@ public slots:
     void copyClipboard2Result();
     void allElection();
     void shear();
-    void deleteText();
 //    void computationalResults(const QString &expression, QString &result);
 //    void historicalLinkage(int index, QString newValue);
 //    void clearLinkageCache(const QString &text, bool isequal);

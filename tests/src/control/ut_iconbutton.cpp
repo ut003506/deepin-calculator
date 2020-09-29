@@ -1,7 +1,7 @@
 #include "ut_iconbutton.h"
 #define private public
 #define protected public
-#include "../../src/control/iconbutton.h"
+#include "src/control/iconbutton.h"
 #undef protected
 #undef private
 
@@ -18,6 +18,7 @@ TEST_F(Ut_IconButton, mousePressEvent)
                                                   m_iconButton->pos(), Qt::MouseButton::LeftButton,
                                                   Qt::MouseButton::NoButton, Qt::KeyboardModifier::NoModifier));
     ASSERT_TRUE(m_iconButton->m_isPress);
+    DSettings::deleteInstance();
 }
 
 TEST_F(Ut_IconButton, mouseReleaseEvent)
@@ -28,6 +29,7 @@ TEST_F(Ut_IconButton, mouseReleaseEvent)
                                                     m_iconButton->pos(), Qt::MouseButton::LeftButton,
                                                     Qt::MouseButton::NoButton, Qt::KeyboardModifier::NoModifier));
     ASSERT_FALSE(m_iconButton->m_isPress);
+    DSettings::deleteInstance();
 }
 
 TEST_F(Ut_IconButton, enterEvent)
@@ -35,6 +37,7 @@ TEST_F(Ut_IconButton, enterEvent)
     IconButton *m_iconButton = new IconButton;
     m_iconButton->enterEvent(new QEvent(QEvent::Type::Enter));
     ASSERT_TRUE(m_iconButton->m_isHover);
+    DSettings::deleteInstance();
 }
 
 TEST_F(Ut_IconButton, leaveEvent)
@@ -42,6 +45,7 @@ TEST_F(Ut_IconButton, leaveEvent)
     IconButton *m_iconButton = new IconButton;
     m_iconButton->leaveEvent(new QEvent(QEvent::Type::Leave));
     ASSERT_FALSE(m_iconButton->m_isHover);
+    DSettings::deleteInstance();
 }
 
 TEST_F(Ut_IconButton, paintEvent)
@@ -80,6 +84,7 @@ TEST_F(Ut_IconButton, paintEvent)
     m_iconButton->m_currentUrl = ":/assets/images/light/deg_press.svg";
     m_iconButton->paintEvent(event);
     //无ASSERT
+    DSettings::deleteInstance();
 }
 
 TEST_F(Ut_IconButton, keyPressEvent)
@@ -95,4 +100,5 @@ TEST_F(Ut_IconButton, keyPressEvent)
     m_iconButton->keyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Return, Qt::NoModifier));
     m_iconButton->keyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_1, Qt::NoModifier));
     //无ASSERT
+    DSettings::deleteInstance();
 }

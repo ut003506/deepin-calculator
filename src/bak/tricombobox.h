@@ -35,7 +35,7 @@
 #include <DSuggestButton>
 #include <DComboBox>
 
-#include "control/textbutton.h"
+#include "src/control/textbutton.h"
 
 DWIDGET_USE_NAMESPACE
 DGUI_USE_NAMESPACE

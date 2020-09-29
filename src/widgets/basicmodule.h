@@ -26,14 +26,14 @@
 #include <DWidget>
 #include <DGuiApplicationHelper>
 
-#include "control/textbutton.h"
-#include "control/iconbutton.h"
-#include "control/basickeypad.h"
-#include "control/memorykeypad.h"
-#include "widgets/inputedit.h"
+#include "src/control/textbutton.h"
+#include "src/control/iconbutton.h"
+#include "src/control/basickeypad.h"
+#include "src/control/memorykeypad.h"
+#include "src/widgets/inputedit.h"
 #include "expressionbar.h"
-#include "views/memorywidget.h"
-#include "memorypublic.h"
+#include "src/views/memorywidget.h"
+#include "src/memorypublic.h"
 
 DGUI_USE_NAMESPACE
 DWIDGET_USE_NAMESPACE
@@ -49,13 +49,11 @@ public:
     void setKeyPress(QKeyEvent *e);
 
     void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
 public slots:
     //memory func
     void mAvailableEvent();
     void mUnAvailableEvent();
     void showListWidget();
-    void closeListWidget();
 private slots:
     void initTheme(int type);
 private:
@@ -63,7 +61,6 @@ private:
     void handleKeypadButtonPress(int);
     void handleKeypadButtonPressByspace(int);
     void handleClearStateChanged(bool isAllClear);
-    void setBasicTabOrder();
 
 protected:
     //void paintEvent(QPaintEvent *);

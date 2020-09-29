@@ -5,6 +5,8 @@
 #include <gmock/gmock-matchers.h>
 #include <QTest>
 
+#include "src/dsettings.h"
+
 class Ut_IconButton : public ::testing::Test
 {
 public:

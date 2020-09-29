@@ -27,8 +27,8 @@
 #include <QTimer>
 #include <DGuiApplicationHelper>
 
-#include "utils.h"
-#include "core/settings.h"
+#include "src/utils.h"
+#include "src/core/settings.h"
 
 const int SCIPREC = 31; //科学计算器精度
 const int LIST_HEIGHT = 35; //输入栏上方表达式的高度
@@ -37,10 +37,10 @@ const int INPUTEDIT_HEIGHT = 55;
 SciExpressionBar::SciExpressionBar(QWidget *parent)
     : DWidget(parent)
 {
-    m_listView = new SimpleListView(0, this);
+    m_listView = new SimpleListView;
     m_listDelegate = new SimpleListDelegate(0, this);
     m_listModel = new SimpleListModel(0, this);
-    m_inputEdit = new InputEdit(this);
+    m_inputEdit = new InputEdit;
     m_evaluator = Evaluator::instance();
     m_isContinue = true;
     m_isAllClear = false;
@@ -2070,7 +2070,6 @@ void SciExpressionBar::copyClipboard2Result()
         emit clearStateChanged(false);
     m_isResult = false;
     m_isUndo = false;
-    addUndo();
 }
 
 void SciExpressionBar::allElection()
@@ -2084,7 +2083,6 @@ void SciExpressionBar::allElection()
 void SciExpressionBar::shear()
 {
     QString text = m_inputEdit->text();
-    int selcurPos = m_inputEdit->cursorPosition();
     QString selectText = m_inputEdit->selectedText();
     selectText = selectText.replace(",", "");
     QApplication::clipboard()->setText(selectText);
@@ -2094,50 +2092,6 @@ void SciExpressionBar::shear()
     m_inputEdit->setText(text);
     addUndo();
     m_isUndo = false;
-    //设置剪切后光标位置
-    if (text.mid(0, selcurPos).remove(QRegExp("[＋－×÷,.%()E]")).length() ==
-            m_inputEdit->text().mid(0, selcurPos).remove(QRegExp("[＋－×÷,.%()E]")).length())
-        m_inputEdit->setCursorPosition(selcurPos);
-    else if (text.mid(0, selcurPos).remove(QRegExp("[＋－×÷,.%()E]")).length() >
-             m_inputEdit->text().mid(0, selcurPos).remove(QRegExp("[＋－×÷,.%()E]")).length())
-        m_inputEdit->setCursorPosition(selcurPos + 1);
-    else
-        m_inputEdit->setCursorPosition(selcurPos - 1);
-
-    //发送C/AC切换信号
-    if (m_inputEdit->text().isEmpty() && m_listModel->rowCount(QModelIndex()) != 0) {
-        emit clearStateChanged(true);
-        m_isAllClear = true;
-    } else {
-        emit clearStateChanged(false);
-        m_isAllClear = false;
-    }
-}
-
-/**
- * @brief 删除事件，选中删除
- */
-void SciExpressionBar::deleteText()
-{
-    QString text = m_inputEdit->text();
-    int selcurPos = m_inputEdit->cursorPosition();
-    int start = m_inputEdit->selectionStart();
-    int length = m_inputEdit->selectionLength();
-    text.remove(start, length);
-    m_inputEdit->setText(text);
-    addUndo();
-    m_isUndo = false;
-    //设置删除后光标位置
-    if (text.mid(0, selcurPos).remove(QRegExp("[＋－×÷,.%()E]")).length() ==
-            m_inputEdit->text().mid(0, selcurPos).remove(QRegExp("[＋－×÷,.%()E]")).length())
-        m_inputEdit->setCursorPosition(selcurPos);
-    else if (text.mid(0, selcurPos).remove(QRegExp("[＋－×÷,.%()E]")).length() >
-             m_inputEdit->text().mid(0, selcurPos).remove(QRegExp("[＋－×÷,.%()E]")).length())
-        m_inputEdit->setCursorPosition(selcurPos + 1);
-    else
-        m_inputEdit->setCursorPosition(selcurPos - 1);
-
-    //发送C/AC切换信号
     if (m_inputEdit->text().isEmpty() && m_listModel->rowCount(QModelIndex()) != 0) {
         emit clearStateChanged(true);
         m_isAllClear = true;
@@ -2194,7 +2148,7 @@ void SciExpressionBar::revisionResults(const QModelIndex &index)
  */
 void SciExpressionBar::hisRevisionResults(const QModelIndex &index, Quantity ans)
 {
-    QString text = index.data(SimpleListModel::ExpressionWithOutTip).toString();
+    QString text = index.data(SimpleListModel::ExpressionRole).toString();
     QStringList historic = text.split(QString("＝"), QString::SkipEmptyParts);
     if (historic.size() != 2)
         return;
@@ -2306,7 +2260,7 @@ void SciExpressionBar::initConnect()
     connect(m_inputEdit, &InputEdit::cut, this, &SciExpressionBar::shear);
     connect(m_inputEdit, &InputEdit::copy, this, &SciExpressionBar::copyResultToClipboard);
     connect(m_inputEdit, &InputEdit::paste, this, &SciExpressionBar::copyClipboard2Result);
-    connect(m_inputEdit, &InputEdit::deleteText, this, &SciExpressionBar::deleteText);
+    connect(m_inputEdit, &InputEdit::deleteText, this, &SciExpressionBar::enterClearEvent);
     connect(m_inputEdit, &InputEdit::selectAllText, this, &SciExpressionBar::allElection);
     connect(m_inputEdit, &InputEdit::undo, this, &SciExpressionBar::Undo);
     connect(m_inputEdit, &InputEdit::redo, this, &SciExpressionBar::Redo);

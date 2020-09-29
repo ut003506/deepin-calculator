@@ -35,7 +35,7 @@
 #include <DPushButton>
 #include <DListWidget>
 
-#include "control/textbutton.h"
+#include "src/control/textbutton.h"
 
 DWIDGET_USE_NAMESPACE
 DGUI_USE_NAMESPACE

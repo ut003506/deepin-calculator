@@ -23,8 +23,8 @@
 #include <DLineEdit>
 #include <DPalette>
 
-#include "math/quantity.h"
-#include "core/evaluator.h"
+#include "src/math/quantity.h"
+#include "src/core/evaluator.h"
 
 DGUI_USE_NAMESPACE
 DWIDGET_USE_NAMESPACE
@@ -84,10 +84,10 @@ protected:
     void keyPressEvent(QKeyEvent *);
     void mouseDoubleClickEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *event);
 
 private slots:
     void initAction();
+    void updateAction();
 //    bool isSymbolCategoryChanged(int pos1, int pos2);
 //    int findWordBeginPosition(int pos);
 //    int findWordEndPosition(int pos);

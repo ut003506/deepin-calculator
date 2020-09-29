@@ -28,6 +28,7 @@
 
 #include "dthememanager.h"
 
+const QSize MEMORYBUTTON_SIZE = QSize(52, 32); //标准模式大小，为画边框比ui大2pix
 const qreal BLURRADIUS = 12; //阴影模糊半径
 const qreal ROUND_XRADIUS = 8; //按钮圆角x轴半径
 const qreal ROUND_YRADIUS = 8; //按钮圆角y轴半径
@@ -37,6 +38,10 @@ MemoryButton::MemoryButton(const QString &text, bool listwidgetbtn, QWidget *par
     , m_effect(new QGraphicsDropShadowEffect(this))
     , m_isallgray(false)
 {
+    m_settings = DSettings::instance(this);
+    int mode = m_settings->getOption("mode").toInt();
+    if (mode == 0)
+        setFixedSize(MEMORYBUTTON_SIZE);
     setObjectName("MemoryButton");
     m_widgetbtn = listwidgetbtn; //是否是内存列表按键
 
@@ -137,16 +142,6 @@ void MemoryButton:: setbuttongray(bool memorywidgetshow)
 }
 
 /**
- * @brief IconButton::updateWhenBtnDisable
- * 当拥有焦点时同时按下空格和鼠标后会导致问题，将其置回普通状态
- */
-void MemoryButton::updateWhenBtnDisable()
-{
-    this->setPalette(m_palette);
-    m_isPress = false;
-}
-
-/**
  * @brief 鼠标按下
  */
 void MemoryButton::mousePressEvent(QMouseEvent *e)
@@ -198,6 +193,11 @@ void MemoryButton::leaveEvent(QEvent *e)
 void MemoryButton::paintEvent(QPaintEvent *e)
 {
     Q_UNUSED(e);
+    int mode = m_settings->getOption("mode").toInt();
+    if (mode == 0)
+        setFixedSize(MEMORYBUTTON_SIZE);
+    if (m_widgetbtn)
+        setFixedSize(MEMORYBUTTON_SIZE);
     if (isEnabled() == false) {
         m_font.setPixelSize(16);
         m_font.setStyleName("Light");

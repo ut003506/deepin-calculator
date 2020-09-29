@@ -14,11 +14,31 @@
     </message>
     <message>
         <source>Clear history</source>
-        <translation>Limpiar historial</translation>
+        <translation>Limpia historial</translation>
     </message>
 </context>
 <context>
     <name>InputEdit</name>
+    <message>
+        <source>&amp;Undo</source>
+        <translation>Deshacer (&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Redo</source>
+        <translation>Rehacer (&amp;R)</translation>
+    </message>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation>Cortar (&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>Copiar (&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation>Pegar (&amp;P)</translation>
+    </message>
     <message>
         <source>Delete</source>
         <translation>Borrar</translation>
@@ -26,26 +46,6 @@
     <message>
         <source>Select All</source>
         <translation>Seleccionar todo</translation>
-    </message>
-    <message>
-        <source>Undo</source>
-        <translation>Deshacer</translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation>Rehacer</translation>
-    </message>
-    <message>
-        <source>Cut</source>
-        <translation>Cortar</translation>
-    </message>
-    <message>
-        <source>Copy</source>
-        <translation>Copiar</translation>
-    </message>
-    <message>
-        <source>Paste</source>
-        <translation>Pegar</translation>
     </message>
 </context>
 <context>
