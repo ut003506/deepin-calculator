@@ -30,8 +30,8 @@ endif()
 if (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug"))
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
-    execute_process(COMMAND bash "${CMAKE_CURRENT_LIST_DIR}/../translate_generation.sh"
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/../)
+    execute_process(COMMAND bash "translate_generation.sh"
+                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif ()
 
 configure_file(src/environments.h.in environments.h @ONLY)
