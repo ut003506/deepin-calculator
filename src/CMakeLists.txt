@@ -38,15 +38,15 @@ find_package(Qt5Xml REQUIRED)
 find_package(Qt5Svg REQUIRED)
 find_package(Qt5Test REQUIRED)
 
-find_package(DtkWidget5.5 REQUIRED)
-find_package(DtkGui5.5 REQUIRED)
-find_package(DtkCore5.5 REQUIRED)
+find_package(DtkWidget REQUIRED)
+find_package(DtkGui REQUIRED)
+find_package(DtkCore REQUIRED)
 #find_package(DFrameworkDbus REQUIRED dframeworkdbus)
 pkg_check_modules(DFrameworkDBus REQUIRED dframeworkdbus)
 
-include_directories(${DtkWidget5.5_INCLUDE_DIRS})
-include_directories(${DtkGui5.5_INCLUDE_DIRS})
-include_directories(${DtkCore5.5_INCLUDE_DIRS})
+include_directories(${DtkWidget_INCLUDE_DIRS})
+include_directories(${DtkGui_INCLUDE_DIRS})
+include_directories(${DtkCore_INCLUDE_DIRS})
 
 set (EXE_NAME deepin-calculator)
 
@@ -58,9 +58,9 @@ set(LINK_LIBS
     Qt5::Svg
     Qt5::Test
 
-    ${DtkWidget5.5_LIBRARIES}
-    ${DtkCore5.5_LIBRARIES}
-    ${DtkGUI5.5_LIBRARIES}
+    ${DtkWidget_LIBRARIES}
+    ${DtkCore_LIBRARIES}
+    ${DtkGUI_LIBRARIES}
     ${DFrameworkDBus_LIBRARIES}
 )
 
@@ -85,9 +85,9 @@ target_include_directories(${EXE_NAME} PUBLIC ${Qt5Widgets_LIBRARIES}
                                               ${Qt5DBus_LIBRARIES}
                                               ${Qt5TestLib_LIBRARIES}
                                               ${PROJECT_BINARY_DIR}
-                                              ${DtkWidget5.5_INCLUDE_DIRS}
-                                              ${DtkCore5.5_LIBRARIES}
-                                              ${DtkGUI5.5_INCLUDE_DIRS}
+                                              ${DtkWidget_INCLUDE_DIRS}
+                                              ${DtkCore_LIBRARIES}
+                                              ${DtkGUI_INCLUDE_DIRS}
                                               ${DFrameworkDBus_INCLUDE_DIRS})
 
 target_link_libraries (${EXE_NAME} ${LINK_LIBS})

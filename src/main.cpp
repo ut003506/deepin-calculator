@@ -133,7 +133,6 @@ int main(int argc, char *argv[])
     cmdParser.addVersionOption();
     cmdParser.process(*app);
 
-
     MainWindowTab windowtab;
     //编译环境中DTK版本低，暂时固定走平板模式
     if (/*DGuiApplicationHelper::isTabletEnvironment()*/1) {
